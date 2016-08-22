@@ -35,7 +35,7 @@ import org.arquillian.extension.governor.api.detector.Detector;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Documented
-public @interface JiraXray {
+public @interface JiraXray{
 
     String value() default "";
 

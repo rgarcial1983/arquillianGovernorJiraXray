@@ -26,6 +26,7 @@ import org.arquillian.extension.governor.api.ClosePassedDecider;
 import org.arquillian.extension.governor.api.GovernorRegistry;
 import org.arquillian.extension.governor.impl.TestMethodExecutionRegister;
 import org.arquillian.extension.governor.jira.xray.api.JiraXray;
+import org.arquillian.extension.governor.jira.xray.configuration.JiraPropertiesUtils;
 import org.arquillian.extension.governor.jira.xray.configuration.JiraXrayGovernorConfiguration;
 import org.arquillian.extension.governor.spi.GovernorProvider;
 import org.arquillian.extension.governor.spi.event.ExecutionDecisionEvent;
@@ -83,7 +84,14 @@ public class JiraXrayTestExecutionDecider implements TestExecutionDecider, Gover
         if (event.getAnnotation().annotationType() == provides()) {
             final JiraXray jiraIssue = (JiraXray) event.getAnnotation();
 
-            this.executionDecision.set(jiraGovernorClient.resolve(jiraIssue));
+            // Check Validations
+            // TODO RGL - CHECKVALIDATIONS
+            // if (checkValidateTestRun(jiraIssue.value())) {
+            if (true) {
+                this.executionDecision.set(jiraGovernorClient.resolve(jiraIssue));
+            } else {
+                this.executionDecision.set(ExecutionDecision.dontExecute(String.format(JiraPropertiesUtils.getInstance().getValorKey("jira.test.error.checkvalidation"), jiraIssue.value())));
+            }
         }
     }
 
@@ -134,4 +142,5 @@ public class JiraXrayTestExecutionDecider implements TestExecutionDecider, Gover
             }
         }
     }
+    
 }

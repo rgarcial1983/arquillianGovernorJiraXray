@@ -17,22 +17,15 @@ import org.arquillian.extension.governor.jira.xray.configuration.JiraXrayGoverno
 import org.jboss.arquillian.core.spi.Validate;
 import org.jboss.arquillian.test.spi.execution.ExecutionDecision;
 
-import com.atlassian.jira.rest.client.api.MetadataRestClient;
 import com.atlassian.jira.rest.client.api.domain.Comment;
-import com.atlassian.jira.rest.client.api.domain.Field;
 import com.atlassian.jira.rest.client.api.domain.Issue;
-import com.atlassian.jira.rest.client.api.domain.IssueType;
-import com.atlassian.jira.rest.client.api.domain.Priority;
-import com.atlassian.jira.rest.client.api.domain.Resolution;
 import com.atlassian.jira.rest.client.api.domain.Transition;
 import com.atlassian.jira.rest.client.api.domain.input.ComplexIssueInputFieldValue;
 import com.atlassian.jira.rest.client.api.domain.input.FieldInput;
 import com.atlassian.jira.rest.client.api.domain.input.TransitionInput;
 import com.atlassian.jira.rest.client.internal.ServerVersionConstants;
-import com.atlassian.util.concurrent.Promise;
 
 import es.cuatrogatos.jira.xray.rest.client.api.XrayJiraRestClient;
-import es.cuatrogatos.jira.xray.rest.client.api.domain.TestRun;
 
 /**
  *
@@ -158,58 +151,11 @@ public class JiraXrayGovernorClient implements GovernorClient<JiraXray, JiraXray
         Validate.notNull(restClient, "Jira REST client must be specified.");
 
         try {
-            final Issue issue = restClient.getIssueClient().getIssue(id).get();
-
-            final Iterable<Transition> transitions = restClient.getIssueClient().getTransitions(issue.getTransitionsUri()).claim();
-            final Transition resolveIssueTransition = getTransitionByName(transitions, "Listo");
-
-            Collection<FieldInput> fieldInputs = null;
-            
-            // Example integrate ApiRestXrayJira
-            Promise<Iterable<TestRun>> it = restClient.getTestRunClient().getTestRuns("PBT-26");
-            
-            
-            
-            ///////////////////////////////////////////////////////////////////////////////////////////
-            final MetadataRestClient client = restClient.getMetadataClient();
-
-            // list issue types
-            System.out.println("issues: ");
-            for (IssueType type : client.getIssueTypes().claim()) {
-                System.out.printf("- %s (%d): %s\n", type.getName(), type.getId(), type.getDescription());
-            }
-            System.out.println();
-
-            System.out.println("priorities: ");
-            for (Priority priority : client.getPriorities().claim()) {
-                System.out.printf("- %s (%d): %s\n", priority.getName(), priority.getId(), priority.getDescription());
-            }
-            System.out.println();
-
-            System.out.println("resolutions: ");
-            for (Resolution resolution : client.getResolutions().claim()) {
-                System.out.printf("- %s: %s\n", resolution.getName(), resolution.getDescription());
-            }
-            System.out.println();
-
-            System.out.println("fields: ");
-            for (Field field : client.getFields().claim()) {
-                System.out.printf("- %s: %s\n", field.getName(), field.getFieldType());
-            }
-            System.out.println();
-            ///////////////////////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////////////////////////
-
-            if (jiraBuildNumber > ServerVersionConstants.BN_JIRA_5) {
-                fieldInputs = Arrays.asList(new FieldInput("resolution", ComplexIssueInputFieldValue.with("name", "Done")));
+            if (resultExecutionTest) {
+                // Update PASS Test
             } else {
-                fieldInputs = Arrays.asList(new FieldInput("resolution", "Done"));
+                // Update FAIL Test 
             }
-
-            final Comment closingMessage = Comment.valueOf(getClosingMessage());
-            final TransitionInput transitionInput = new TransitionInput(resolveIssueTransition.getId(), fieldInputs, closingMessage);
-
-            restClient.getIssueClient().transition(issue.getTransitionsUri(), transitionInput).claim();
         } catch (Exception e) {
             // error while getting Issue to close, doing nothing
         }
