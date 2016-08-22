@@ -28,7 +28,7 @@ import org.junit.runner.RunWith;
 //@Jira("PBT-27")
 public class ITJiraXrayGovernorTest {
     @Test
-    @JiraXray(value = "PBT-27")
+    @JiraXray(value = "PBT-26")
     public void wontBeSkippedBecauseResolved() {
         Assert.assertTrue(true);
     }

@@ -43,7 +43,7 @@ import org.jboss.arquillian.test.spi.execution.ExecutionDecision.Decision;
 import org.jboss.arquillian.test.spi.execution.TestExecutionDecider;
 
 /**
- * @author <a href="mailto:smikloso@redhat.com">Stefan Miklosovic</a>
+ *
  */
 public class JiraXrayTestExecutionDecider implements TestExecutionDecider, GovernorProvider {
     private static final Map<Method, Integer> lifecycleCountRegister = new HashMap<Method, Integer>();
@@ -58,7 +58,9 @@ public class JiraXrayTestExecutionDecider implements TestExecutionDecider, Gover
 
     @Override
     public ExecutionDecision decide(Method testMethod) {
+        
         return TestMethodExecutionRegister.resolve(testMethod, provides());
+        
     }
 
     @Override

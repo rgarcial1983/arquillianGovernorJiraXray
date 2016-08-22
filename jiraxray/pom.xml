@@ -32,6 +32,7 @@
         <version.atlassian.jira>2.0.0-m31.w2</version.atlassian.jira>
         <version.jersey.client>1.5</version.jersey.client>
         <version.hamcrest>1.0.0.0</version.hamcrest>
+        <version.xrayrestclient>1.0-SNAPSHOT</version.xrayrestclient>
     </properties>
 
     <!-- Dependencies -->
@@ -107,6 +108,14 @@
             <artifactId>hamcrest-junit</artifactId>
             <version>${version.hamcrest}</version>
         </dependency>
+        
+        <!-- Plugin ApiRestJiraXray by Lucho -->
+        <dependency>
+	        <groupId>es.cuatrogatos.jira.plugins</groupId>
+		    <artifactId>XrayRestClient</artifactId>
+		    <version>${version.xrayrestclient}</version>
+        </dependency>
+        
     </dependencies>
 
 </project>

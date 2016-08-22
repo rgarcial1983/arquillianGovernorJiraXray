@@ -23,10 +23,11 @@ import org.arquillian.extension.governor.jira.xray.configuration.JiraXrayGoverno
 import org.jboss.arquillian.core.spi.Validate;
 
 import com.atlassian.jira.rest.client.api.AuthenticationHandler;
-import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.auth.AnonymousAuthenticationHandler;
 import com.atlassian.jira.rest.client.auth.BasicHttpAuthenticationHandler;
-import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
+
+import es.cuatrogatos.jira.xray.rest.client.api.XrayJiraRestClient;
+import es.cuatrogatos.jira.xray.rest.client.core.internal.async.XrayRestAsyncRestClientFactory;
 
 /**
  * 
@@ -44,7 +45,7 @@ public class JiraXrayGovernorClientFactory implements GovernorClientFactory<Jira
         final String username = this.jiraGovernorConfiguration.getUsername();
         final String password = this.jiraGovernorConfiguration.getPassword();
 
-        final AsynchronousJiraRestClientFactory factory = new AsynchronousJiraRestClientFactory();
+        final XrayRestAsyncRestClientFactory factory = new XrayRestAsyncRestClientFactory();
 
         final AuthenticationHandler authHandler;
 
@@ -55,7 +56,8 @@ public class JiraXrayGovernorClientFactory implements GovernorClientFactory<Jira
             authHandler = new BasicHttpAuthenticationHandler(username, password);
         }
 
-        final JiraRestClient restClient = factory.create(jiraServerUri, authHandler);
+        // Api XrayJira by Lucho
+        final XrayJiraRestClient restClient = (XrayJiraRestClient) factory.create(jiraServerUri, authHandler);
 
         final JiraXrayGovernorClient client = new JiraXrayGovernorClient();
         client.setConfiguration(this.jiraGovernorConfiguration);
