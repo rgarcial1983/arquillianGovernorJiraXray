@@ -17,7 +17,7 @@
 package org.arquillian.extension.governor.jira.xray;
 
 import org.arquillian.extension.governor.jira.xray.configuration.JiraXrayGovernorConfigurator;
-import org.arquillian.extension.governor.jira.xray.impl.JiraTestExecutionDecider;
+import org.arquillian.extension.governor.jira.xray.impl.JiraXrayTestExecutionDecider;
 import org.jboss.arquillian.core.spi.LoadableExtension;
 import org.jboss.arquillian.test.spi.execution.TestExecutionDecider;
 
@@ -28,10 +28,10 @@ public class JiraXrayGovernorExtension implements LoadableExtension {
 
     @Override
     public void register(ExtensionBuilder builder) {
-        builder.observer(JiraTestExecutionDecider.class);
+        builder.observer(JiraXrayTestExecutionDecider.class);
         builder.observer(JiraXrayGovernorConfigurator.class);
 
-        builder.service(TestExecutionDecider.class, JiraTestExecutionDecider.class);
+        builder.service(TestExecutionDecider.class, JiraXrayTestExecutionDecider.class);
     }
 
 }

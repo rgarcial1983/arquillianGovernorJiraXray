@@ -20,7 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.arquillian.extension.governor.jira.xray.impl.JiraXrayGovernorClient;
-import org.arquillian.extension.governor.jira.xray.impl.JiraGovernorClientFactory;
+import org.arquillian.extension.governor.jira.xray.impl.JiraXrayGovernorClientFactory;
 import org.arquillian.extension.governor.spi.event.GovernorExtensionConfigured;
 import org.jboss.arquillian.config.descriptor.api.ArquillianDescriptor;
 import org.jboss.arquillian.config.descriptor.api.ExtensionDef;
@@ -63,7 +63,7 @@ public class JiraXrayGovernorConfigurator {
 
         this.jiraGovernorConfiguration.set(jiraGovernorConfiguration);
 
-        final JiraXrayGovernorClient jiraGovernorClient = new JiraGovernorClientFactory().build(this.jiraGovernorConfiguration.get());
+        final JiraXrayGovernorClient jiraGovernorClient = new JiraXrayGovernorClientFactory().build(this.jiraGovernorConfiguration.get());
 
         this.jiraGovernorClient.set(jiraGovernorClient);
 

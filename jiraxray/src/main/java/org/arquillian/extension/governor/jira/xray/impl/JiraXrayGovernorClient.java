@@ -42,9 +42,9 @@ import com.atlassian.jira.rest.client.internal.ServerVersionConstants;
 /**
  *
  */
-public class JiraXrayGovernorClient implements GovernorClient<JiraXray, JiraGovernorStrategy> {
+public class JiraXrayGovernorClient implements GovernorClient<JiraXray, JiraXrayGovernorStrategy> {
     private JiraRestClient restClient;
-    private JiraGovernorStrategy jiraGovernorStrategy;
+    private JiraXrayGovernorStrategy jiraGovernorStrategy;
     private JiraXrayGovernorConfiguration jiraGovernorConfiguration;
 
     private int jiraBuildNumber = 0;
@@ -146,7 +146,7 @@ public class JiraXrayGovernorClient implements GovernorClient<JiraXray, JiraGove
     // not publicly visible helpers
 
     @Override
-    public void setGovernorStrategy(JiraGovernorStrategy jiraGovernorStrategy) {
+    public void setGovernorStrategy(JiraXrayGovernorStrategy jiraGovernorStrategy) {
         Validate.notNull(jiraGovernorStrategy, "Jira Governor strategy must be specified.");
         this.jiraGovernorStrategy = jiraGovernorStrategy;
     }
@@ -172,6 +172,38 @@ public class JiraXrayGovernorClient implements GovernorClient<JiraXray, JiraGove
         Validate.notNull(jiraGovernorConfiguration, "Jira Governor configuration must be set.");
 
         return String.format(jiraGovernorConfiguration.getClosingMessage(), jiraGovernorConfiguration.getUsername());
+    }
+
+    /**
+     * Method change status testRun according resultExecutionTest
+     * @param id
+     * @param resultRunTest
+     */
+    public void close(String id, Boolean resultExecutionTest) {
+
+        Validate.notNull(restClient, "Jira REST client must be specified.");
+
+        try {
+            final Issue issue = restClient.getIssueClient().getIssue(id).get();
+
+            final Iterable<Transition> transitions = restClient.getIssueClient().getTransitions(issue.getTransitionsUri()).claim();
+            final Transition resolveIssueTransition = getTransitionByName(transitions, "Resolve Issue");
+
+            final Collection<FieldInput> fieldInputs;
+
+            if (jiraBuildNumber > ServerVersionConstants.BN_JIRA_5) {
+                fieldInputs = Arrays.asList(new FieldInput("resolution", ComplexIssueInputFieldValue.with("name", "Done")));
+            } else {
+                fieldInputs = Arrays.asList(new FieldInput("resolution", "Done"));
+            }
+
+            final Comment closingMessage = Comment.valueOf(getClosingMessage());
+            final TransitionInput transitionInput = new TransitionInput(resolveIssueTransition.getId(), fieldInputs, closingMessage);
+
+            restClient.getIssueClient().transition(issue.getTransitionsUri(), transitionInput).claim();
+        } catch (Exception e) {
+            // error while getting Issue to close, doing nothing
+        }
     }
 
 }

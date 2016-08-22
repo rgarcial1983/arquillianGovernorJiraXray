@@ -40,8 +40,8 @@ import org.arquillian.extension.governor.jira.xray.api.JiraXray;
 import org.arquillian.extension.governor.jira.xray.configuration.JiraXrayGovernorConfiguration;
 import org.arquillian.extension.governor.jira.xray.configuration.JiraXrayGovernorConfigurator;
 import org.arquillian.extension.governor.jira.xray.impl.JiraXrayGovernorClient;
-import org.arquillian.extension.governor.jira.xray.impl.JiraGovernorClientFactory;
-import org.arquillian.extension.governor.jira.xray.impl.JiraTestExecutionDecider;
+import org.arquillian.extension.governor.jira.xray.impl.JiraXrayGovernorClientFactory;
+import org.arquillian.extension.governor.jira.xray.impl.JiraXrayTestExecutionDecider;
 import org.arquillian.extension.governor.spi.GovernorProvider;
 import org.arquillian.extension.governor.spi.event.DecideMethodExecutions;
 import org.arquillian.extension.governor.spi.event.ExecutionDecisionEvent;
@@ -151,7 +151,7 @@ public class JiraXrayGovernorTestCase extends AbstractGovernorTestCase {
     @Override
     public void addExtensions(List<Class<?>> extensions) {
         extensions.add(JiraXrayGovernorConfigurator.class);
-        extensions.add(JiraTestExecutionDecider.class);
+        extensions.add(JiraXrayTestExecutionDecider.class);
         extensions.add(GovernorTestClassScanner.class);
         extensions.add(GovernorExecutionDecider.class);
         extensions.add(GovernorConfigurator.class);
@@ -182,7 +182,7 @@ public class JiraXrayGovernorTestCase extends AbstractGovernorTestCase {
 
         bind(ApplicationScoped.class, JiraXrayGovernorConfiguration.class, jiraGovernorConfiguration);
 
-        final JiraXrayGovernorClient jiraGovernorClient = new JiraGovernorClientFactory().build(jiraGovernorConfiguration);
+        final JiraXrayGovernorClient jiraGovernorClient = new JiraXrayGovernorClientFactory().build(jiraGovernorConfiguration);
         bind(ApplicationScoped.class, JiraXrayGovernorClient.class, jiraGovernorClient);
     }
 

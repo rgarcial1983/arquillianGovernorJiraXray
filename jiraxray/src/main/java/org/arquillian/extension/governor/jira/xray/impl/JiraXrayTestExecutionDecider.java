@@ -45,7 +45,7 @@ import org.jboss.arquillian.test.spi.execution.TestExecutionDecider;
 /**
  * @author <a href="mailto:smikloso@redhat.com">Stefan Miklosovic</a>
  */
-public class JiraTestExecutionDecider implements TestExecutionDecider, GovernorProvider {
+public class JiraXrayTestExecutionDecider implements TestExecutionDecider, GovernorProvider {
     private static final Map<Method, Integer> lifecycleCountRegister = new HashMap<Method, Integer>();
 
     @Inject
@@ -102,8 +102,8 @@ public class JiraTestExecutionDecider implements TestExecutionDecider, GovernorP
 
             if (jiraGovernorConfiguration.getClosePassed()) {
                 // we decided we run this test method even it has annotation on it
-                if (decision.getDecision() == Decision.EXECUTE
-                        && (JiraGovernorStrategy.FORCING_EXECUTION_REASON_STRING).equals(decision.getReason())) {
+                if (decision.getDecision() == Decision.EXECUTE) {
+                        //&& (JiraXrayGovernorStrategy.FORCING_EXECUTION_REASON_STRING).equals(decision.getReason())) {
 
                     for (final Map.Entry<Method, List<Annotation>> entry : governorRegistry.get().entrySet()) {
                         if (entry.getKey().toString().equals(event.getTestMethod().toString())) {
@@ -127,7 +127,8 @@ public class JiraTestExecutionDecider implements TestExecutionDecider, GovernorP
             final Annotation annotation = entry.getKey();
             if (annotation.annotationType() == provides() && entry.getValue()) {
                 final String id = ((JiraXray) annotation).value();
-                jiraGovernorClient.close(id);
+                // Call method close according result execution test (PASS/FAIL)
+                jiraGovernorClient.close(id, entry.getValue());
             }
         }
     }

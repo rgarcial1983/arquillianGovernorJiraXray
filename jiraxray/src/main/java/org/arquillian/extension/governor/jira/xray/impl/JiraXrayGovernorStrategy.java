@@ -16,40 +16,42 @@
  */
 package org.arquillian.extension.governor.jira.xray.impl;
 
-import com.atlassian.jira.rest.client.api.domain.Issue;
+import java.util.logging.Logger;
+
 import org.arquillian.extension.governor.api.GovernorStrategy;
 import org.arquillian.extension.governor.api.detector.DetectorProcessor;
 import org.arquillian.extension.governor.jira.xray.api.JiraXray;
+import org.arquillian.extension.governor.jira.xray.configuration.JiraPropertiesUtils;
 import org.arquillian.extension.governor.jira.xray.configuration.JiraXrayGovernorConfiguration;
 import org.jboss.arquillian.core.spi.Validate;
 import org.jboss.arquillian.test.spi.execution.ExecutionDecision;
 
-import java.util.logging.Logger;
+import com.atlassian.jira.rest.client.api.domain.Issue;
 
 /**
- * @author <a href="mailto:smikloso@redhat.com">Stefan Miklosovic</a>
+ *
  */
-public class JiraGovernorStrategy implements GovernorStrategy {
+public class JiraXrayGovernorStrategy implements GovernorStrategy {
     public static final String FORCING_EXECUTION_REASON_STRING = "forcing execution";
     public static final String SKIPPING_EXECUTION_REASON_STRING = "Skipping %s. Status %s.";
-    public static final String JIRA_CLOSED_STRING = "Closed";
-    public static final String JIRA_RESOLVED_STRING = "Resolved";
-    private static final Logger logger = Logger.getLogger(JiraGovernorStrategy.class.getName());
+    public static final String JIRA_CLOSED_STRING = JiraPropertiesUtils.getInstance().getValorKey("jira.status.issue.todo"); //"Closed";
+    public static final String JIRA_RESOLVED_STRING = JiraPropertiesUtils.getInstance().getValorKey("jira.status.issue.done"); //"Resolved";
+    private static final Logger logger = Logger.getLogger(JiraXrayGovernorStrategy.class.getName());
     private final JiraXrayGovernorConfiguration jiraGovernorConfiguration;
     private Issue jiraIssue;
     private JiraXray annotation;
 
-    public JiraGovernorStrategy(JiraXrayGovernorConfiguration jiraGovernorConfiguration) {
+    public JiraXrayGovernorStrategy(JiraXrayGovernorConfiguration jiraGovernorConfiguration) {
         Validate.notNull(jiraGovernorConfiguration, "Jira Governor configuration has to be set.");
         this.jiraGovernorConfiguration = jiraGovernorConfiguration;
     }
 
-    public JiraGovernorStrategy issue(Issue jiraIssue) {
+    public JiraXrayGovernorStrategy issue(Issue jiraIssue) {
         this.jiraIssue = jiraIssue;
         return this;
     }
 
-    public JiraGovernorStrategy annotation(JiraXray annotation) {
+    public JiraXrayGovernorStrategy annotation(JiraXray annotation) {
         this.annotation = annotation;
         return this;
     }

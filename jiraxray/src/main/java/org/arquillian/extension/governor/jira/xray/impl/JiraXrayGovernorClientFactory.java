@@ -16,21 +16,22 @@
  */
 package org.arquillian.extension.governor.jira.xray.impl;
 
+import java.net.URI;
+
+import org.arquillian.extension.governor.api.GovernorClientFactory;
+import org.arquillian.extension.governor.jira.xray.configuration.JiraXrayGovernorConfiguration;
+import org.jboss.arquillian.core.spi.Validate;
+
 import com.atlassian.jira.rest.client.api.AuthenticationHandler;
 import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.auth.AnonymousAuthenticationHandler;
 import com.atlassian.jira.rest.client.auth.BasicHttpAuthenticationHandler;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
-import org.arquillian.extension.governor.api.GovernorClientFactory;
-import org.arquillian.extension.governor.jira.xray.configuration.JiraXrayGovernorConfiguration;
-import org.jboss.arquillian.core.spi.Validate;
-
-import java.net.URI;
 
 /**
- * @author <a href="mailto:smikloso@redhat.com">Stefan Miklosovic</a>
+ * 
  */
-public class JiraGovernorClientFactory implements GovernorClientFactory<JiraXrayGovernorConfiguration, JiraXrayGovernorClient> {
+public class JiraXrayGovernorClientFactory implements GovernorClientFactory<JiraXrayGovernorConfiguration, JiraXrayGovernorClient> {
 
     private JiraXrayGovernorConfiguration jiraGovernorConfiguration = null;
 
@@ -59,7 +60,7 @@ public class JiraGovernorClientFactory implements GovernorClientFactory<JiraXray
         final JiraXrayGovernorClient client = new JiraXrayGovernorClient();
         client.setConfiguration(this.jiraGovernorConfiguration);
         client.initializeRestClient(restClient);
-        client.setGovernorStrategy(new JiraGovernorStrategy(jiraGovernorConfiguration));
+        client.setGovernorStrategy(new JiraXrayGovernorStrategy(jiraGovernorConfiguration));
 
         return client;
     }
