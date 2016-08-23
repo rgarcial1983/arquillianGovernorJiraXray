@@ -18,6 +18,7 @@ package org.arquillian.extension.governor.jira.xray.impl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,8 @@ import org.arquillian.extension.governor.api.ClosePassedDecider;
 import org.arquillian.extension.governor.api.GovernorRegistry;
 import org.arquillian.extension.governor.impl.TestMethodExecutionRegister;
 import org.arquillian.extension.governor.jira.xray.api.JiraXray;
+import org.arquillian.extension.governor.jira.xray.api.validation.JiraXrayRegistrationRule;
+import org.arquillian.extension.governor.jira.xray.api.validation.JiraXrayValidationStatusRule;
 import org.arquillian.extension.governor.jira.xray.configuration.JiraPropertiesUtils;
 import org.arquillian.extension.governor.jira.xray.configuration.JiraXrayGovernorConfiguration;
 import org.arquillian.extension.governor.spi.GovernorProvider;
@@ -85,9 +88,7 @@ public class JiraXrayTestExecutionDecider implements TestExecutionDecider, Gover
             final JiraXray jiraIssue = (JiraXray) event.getAnnotation();
 
             // Check Validations
-            // TODO RGL - CHECKVALIDATIONS
-            // if (checkValidateTestRun(jiraIssue.value())) {
-            if (true) {
+            if (checkValidateRunTest(jiraIssue, jiraGovernorClient)) {            
                 this.executionDecision.set(jiraGovernorClient.resolve(jiraIssue));
             } else {
                 this.executionDecision.set(ExecutionDecision.dontExecute(String.format(JiraPropertiesUtils.getInstance().getValorKey("jira.test.error.checkvalidation"), jiraIssue.value())));
@@ -143,4 +144,21 @@ public class JiraXrayTestExecutionDecider implements TestExecutionDecider, Gover
         }
     }
     
+    
+    
+    public boolean checkValidateRunTest(JiraXray jiraIssue, JiraXrayGovernorClient jiraGovernorClient) {
+        boolean result = true;
+        List<JiraXrayRegistrationRule> rules = new ArrayList<JiraXrayRegistrationRule>();
+        // Add Validations
+        rules.add(new JiraXrayValidationStatusRule());
+        
+        // Runs Validations and check result
+        for (JiraXrayRegistrationRule rule : rules) {
+            if (!rule.validate(jiraIssue.value(), jiraGovernorClient)) {
+                result = false;
+                break;
+            }
+        }
+        return result;
+    }
 }

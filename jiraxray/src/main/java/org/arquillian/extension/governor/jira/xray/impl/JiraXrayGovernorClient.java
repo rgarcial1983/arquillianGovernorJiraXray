@@ -105,41 +105,6 @@ public class JiraXrayGovernorClient implements GovernorClient<JiraXray, JiraXray
         }
     }
 
-    // not publicly visible helpers
-
-    @Override
-    public void setGovernorStrategy(JiraXrayGovernorStrategy jiraGovernorStrategy) {
-
-        Validate.notNull(jiraGovernorStrategy, "Jira Governor strategy must be specified.");
-        this.jiraGovernorStrategy = jiraGovernorStrategy;
-    }
-
-    // private helpers
-
-    void initializeRestClient(final XrayJiraRestClient restClient) throws Exception {
-
-        Validate.notNull(restClient, "Xray Jira REST client must be specified.");
-        this.restClient = restClient;
-
-        jiraBuildNumber = this.restClient.getMetadataClient().getServerInfo().claim().getBuildNumber();
-    }
-
-    private Issue getIssue(String key) {
-
-        try {
-            return restClient.getIssueClient().getIssue(key).get();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private String getClosingMessage() {
-
-        Validate.notNull(jiraGovernorConfiguration, "Jira Governor configuration must be set.");
-
-        return String.format(jiraGovernorConfiguration.getClosingMessage(), jiraGovernorConfiguration.getUsername());
-    }
-
     /**
      * Method change status testRun according resultExecutionTest
      * 
@@ -159,6 +124,47 @@ public class JiraXrayGovernorClient implements GovernorClient<JiraXray, JiraXray
         } catch (Exception e) {
             // error while getting Issue to close, doing nothing
         }
+    }
+    
+    // not publicly visible helpers
+
+    @Override
+    public void setGovernorStrategy(JiraXrayGovernorStrategy jiraGovernorStrategy) {
+
+        Validate.notNull(jiraGovernorStrategy, "Jira Governor strategy must be specified.");
+        this.jiraGovernorStrategy = jiraGovernorStrategy;
+    }
+
+    // private helpers
+
+    void initializeRestClient(final XrayJiraRestClient restClient) throws Exception {
+
+        Validate.notNull(restClient, "Xray Jira REST client must be specified.");
+        this.restClient = restClient;
+
+        jiraBuildNumber = this.restClient.getMetadataClient().getServerInfo().claim().getBuildNumber();
+    }
+
+    
+    public XrayJiraRestClient getRestClient() {
+    
+        return restClient;
+    }
+
+    private Issue getIssue(String key) {
+
+        try {
+            return restClient.getIssueClient().getIssue(key).get();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private String getClosingMessage() {
+
+        Validate.notNull(jiraGovernorConfiguration, "Jira Governor configuration must be set.");
+
+        return String.format(jiraGovernorConfiguration.getClosingMessage(), jiraGovernorConfiguration.getUsername());
     }
 
 }

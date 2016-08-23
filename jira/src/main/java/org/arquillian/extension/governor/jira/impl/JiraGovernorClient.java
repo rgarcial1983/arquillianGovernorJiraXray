@@ -16,28 +16,23 @@
  */
 package org.arquillian.extension.governor.jira.impl;
 
-import com.atlassian.jira.rest.client.api.JiraRestClient;
-import com.atlassian.jira.rest.client.api.MetadataRestClient;
-import com.atlassian.jira.rest.client.api.domain.Comment;
-import com.atlassian.jira.rest.client.api.domain.Field;
-import com.atlassian.jira.rest.client.api.domain.Issue;
-import com.atlassian.jira.rest.client.api.domain.IssueType;
-import com.atlassian.jira.rest.client.api.domain.Priority;
-import com.atlassian.jira.rest.client.api.domain.Resolution;
-import com.atlassian.jira.rest.client.api.domain.Status;
-import com.atlassian.jira.rest.client.api.domain.Transition;
-import com.atlassian.jira.rest.client.api.domain.input.ComplexIssueInputFieldValue;
-import com.atlassian.jira.rest.client.api.domain.input.FieldInput;
-import com.atlassian.jira.rest.client.api.domain.input.TransitionInput;
-import com.atlassian.jira.rest.client.internal.ServerVersionConstants;
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.arquillian.extension.governor.api.GovernorClient;
 import org.arquillian.extension.governor.jira.api.Jira;
 import org.arquillian.extension.governor.jira.configuration.JiraGovernorConfiguration;
 import org.jboss.arquillian.core.spi.Validate;
 import org.jboss.arquillian.test.spi.execution.ExecutionDecision;
 
-import java.util.Arrays;
-import java.util.Collection;
+import com.atlassian.jira.rest.client.api.JiraRestClient;
+import com.atlassian.jira.rest.client.api.domain.Comment;
+import com.atlassian.jira.rest.client.api.domain.Issue;
+import com.atlassian.jira.rest.client.api.domain.Transition;
+import com.atlassian.jira.rest.client.api.domain.input.ComplexIssueInputFieldValue;
+import com.atlassian.jira.rest.client.api.domain.input.FieldInput;
+import com.atlassian.jira.rest.client.api.domain.input.TransitionInput;
+import com.atlassian.jira.rest.client.internal.ServerVersionConstants;
 
 /**
  * @author <a href="mailto:smikloso@redhat.com">Stefan Miklosovic</a>
@@ -93,41 +88,10 @@ public class JiraGovernorClient implements GovernorClient<Jira, JiraGovernorStra
             final Issue issue = restClient.getIssueClient().getIssue(id).get();
 
             final Iterable<Transition> transitions = restClient.getIssueClient().getTransitions(issue.getTransitionsUri()).claim();
-            final Transition resolveIssueTransition = getTransitionByName(transitions, "Listo");
+            final Transition resolveIssueTransition = getTransitionByName(transitions, "Resolve Issue");
 
-            Collection<FieldInput> fieldInputs = null;
-            
-            ///////////////////////////////////////////////////////////////////////////////////////////
-            final MetadataRestClient client = restClient.getMetadataClient();
+            final Collection<FieldInput> fieldInputs;
 
-            // list issue types
-            System.out.println("issues: ");
-            for (IssueType type : client.getIssueTypes().claim()) {
-                System.out.printf("- %s (%d): %s\n", type.getName(), type.getId(), type.getDescription());
-            }
-            System.out.println();
-
-            System.out.println("priorities: ");
-            for (Priority priority : client.getPriorities().claim()) {
-                System.out.printf("- %s (%d): %s\n", priority.getName(), priority.getId(), priority.getDescription());
-            }
-            System.out.println();
-
-            System.out.println("resolutions: ");
-            for (Resolution resolution : client.getResolutions().claim()) {
-                System.out.printf("- %s: %s\n", resolution.getName(), resolution.getDescription());
-            }
-            System.out.println();
-            
-            System.out.println("fields: ");
-            for (Field field : client.getFields().claim()) {
-                System.out.printf("- %s: %s\n", field.getName(), field.getFieldType());
-            }
-            System.out.println();
-            ///////////////////////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////////////////////////
-            
-            
             if (jiraBuildNumber > ServerVersionConstants.BN_JIRA_5) {
                 fieldInputs = Arrays.asList(new FieldInput("resolution", ComplexIssueInputFieldValue.with("name", "Done")));
             } else {
