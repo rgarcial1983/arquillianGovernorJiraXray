@@ -13,6 +13,7 @@ import es.cuatrogatos.jira.xray.rest.client.api.XrayJiraRestClient;
 import es.cuatrogatos.jira.xray.rest.client.api.domain.TestRun;
 
 public class JiraXrayValidationStatusRule implements JiraXrayRegistrationRule {
+
     
     // TODO 
     @Inject
@@ -37,14 +38,11 @@ public class JiraXrayValidationStatusRule implements JiraXrayRegistrationRule {
         XrayJiraRestClient restClient = jiraGovernorClient.getRestClient();
         
         try {
-            // 
-            
             // Get TestsRun of Test
             Promise<Iterable<TestRun>> ListTestRuns = restClient.getTestRunClient().getTestRuns(testKey);
             Iterable<TestRun> future = ListTestRuns.get();
             for (TestRun testRun : future) {
-                // Run each TestRun for get key
-                Long idTestRun = testRun.getId();
+                // Run each TestRun for get key                
                 testRun.getStatus();
             }
         

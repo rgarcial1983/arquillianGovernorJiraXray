@@ -18,7 +18,8 @@ package org.arquillian.extension.governor.jira.xray.impl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +28,7 @@ import org.arquillian.extension.governor.api.ClosePassedDecider;
 import org.arquillian.extension.governor.api.GovernorRegistry;
 import org.arquillian.extension.governor.impl.TestMethodExecutionRegister;
 import org.arquillian.extension.governor.jira.xray.api.JiraXray;
-import org.arquillian.extension.governor.jira.xray.api.validation.JiraXrayRegistrationRule;
-import org.arquillian.extension.governor.jira.xray.api.validation.JiraXrayValidationStatusRule;
+import org.arquillian.extension.governor.jira.xray.api.validation.TestRunStatusTodo;
 import org.arquillian.extension.governor.jira.xray.configuration.JiraPropertiesUtils;
 import org.arquillian.extension.governor.jira.xray.configuration.JiraXrayGovernorConfiguration;
 import org.arquillian.extension.governor.spi.GovernorProvider;
@@ -45,6 +45,8 @@ import org.jboss.arquillian.test.spi.event.suite.AfterTestLifecycleEvent;
 import org.jboss.arquillian.test.spi.execution.ExecutionDecision;
 import org.jboss.arquillian.test.spi.execution.ExecutionDecision.Decision;
 import org.jboss.arquillian.test.spi.execution.TestExecutionDecider;
+
+import es.cuatrogatos.jira.xray.rest.client.api.domain.TestRun;
 
 /**
  *
@@ -148,17 +150,37 @@ public class JiraXrayTestExecutionDecider implements TestExecutionDecider, Gover
     
     public boolean checkValidateRunTest(JiraXray jiraIssue, JiraXrayGovernorClient jiraGovernorClient) {
         boolean result = true;
-        List<JiraXrayRegistrationRule> rules = new ArrayList<JiraXrayRegistrationRule>();
-        // Add Validations
-        rules.add(new JiraXrayValidationStatusRule());
         
-        // Runs Validations and check result
-        for (JiraXrayRegistrationRule rule : rules) {
-            if (!rule.validate(jiraIssue.value(), jiraGovernorClient)) {
-                result = false;
-                break;
-            }
+        TestRunStatusTodo rule1=null,rule2=null;
+        try {
+            
+             rule1=new TestRunStatusTodo(new TestRun(new URI(""),"",0L));
+             rule2=new TestRunStatusTodo(new TestRun(new URI(""),"",0L));
+             result =  rule1.setAnd(rule2).validate();
+
+        } catch (URISyntaxException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
+                
         return result;
+        
+        
+        
+//      List<JiraXrayRegistrationRule> rules = new ArrayList<JiraXrayRegistrationRule>();
+//      // Add Validations
+//      rules.add(new JiraXrayValidationStatusRule());
+//        
+//        
+//        
+//        
+//        // Runs Validations and check result
+//        for (JiraXrayRegistrationRule rule : rules) {
+//            if (!rule.validate(jiraIssue.value(), jiraGovernorClient)) {
+//                result = false;
+//                break;
+//            }
+//        }
+//        return result;
     }
 }
