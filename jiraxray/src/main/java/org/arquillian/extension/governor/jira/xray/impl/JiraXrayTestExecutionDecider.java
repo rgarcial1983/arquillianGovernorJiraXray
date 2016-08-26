@@ -18,8 +18,7 @@ package org.arquillian.extension.governor.jira.xray.impl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +27,9 @@ import org.arquillian.extension.governor.api.ClosePassedDecider;
 import org.arquillian.extension.governor.api.GovernorRegistry;
 import org.arquillian.extension.governor.impl.TestMethodExecutionRegister;
 import org.arquillian.extension.governor.jira.xray.api.JiraXray;
+import org.arquillian.extension.governor.jira.xray.api.validation.IJiraXrayUtils;
+import org.arquillian.extension.governor.jira.xray.api.validation.TestExecStartDateOver;
+import org.arquillian.extension.governor.jira.xray.api.validation.TestExecStatusTodo;
 import org.arquillian.extension.governor.jira.xray.api.validation.TestRunStatusTodo;
 import org.arquillian.extension.governor.jira.xray.configuration.JiraPropertiesUtils;
 import org.arquillian.extension.governor.jira.xray.configuration.JiraXrayGovernorConfiguration;
@@ -90,7 +92,7 @@ public class JiraXrayTestExecutionDecider implements TestExecutionDecider, Gover
             final JiraXray jiraIssue = (JiraXray) event.getAnnotation();
 
             // Check Validations
-            if (checkValidateRunTest(jiraIssue, jiraGovernorClient)) {            
+            if (checkValidateRunTest(jiraIssue, jiraGovernorClient)) {
                 this.executionDecision.set(jiraGovernorClient.resolve(jiraIssue));
             } else {
                 this.executionDecision.set(ExecutionDecision.dontExecute(String.format(JiraPropertiesUtils.getInstance().getValorKey("jira.test.error.checkvalidation"), jiraIssue.value())));
@@ -138,7 +140,7 @@ public class JiraXrayTestExecutionDecider implements TestExecutionDecider, Gover
     public void on(@Observes AfterSuite event, JiraXrayGovernorClient jiraGovernorClient) {
         for (final Map.Entry<Annotation, Boolean> entry : closePassedDecider.get().get().entrySet()) {
             final Annotation annotation = entry.getKey();
-            if (annotation.annotationType() == provides() && entry.getValue()) {
+            if (annotation.annotationType() == provides()) {
                 final String id = ((JiraXray) annotation).value();
                 // Call method close according result execution test (PASS/FAIL)
                 jiraGovernorClient.close(id, entry.getValue());
@@ -148,17 +150,37 @@ public class JiraXrayTestExecutionDecider implements TestExecutionDecider, Gover
     
     
     
-    public boolean checkValidateRunTest(JiraXray jiraIssue, JiraXrayGovernorClient jiraGovernorClient) {
+    public boolean checkValidateRunTest(JiraXray issue, JiraXrayGovernorClient jiraGovernorClient) {
         boolean result = true;
+        IJiraXrayUtils jiraUtils = new JiraXrayUtilsImpl();
         
-        TestRunStatusTodo rule1=null,rule2=null;
+        // Rules Validates
+        TestRunStatusTodo rule1 = null;
+        TestExecStatusTodo rule2 = null;
+        TestExecStartDateOver rule3 = null;
+        
         try {
             
-             rule1=new TestRunStatusTodo(new TestRun(new URI(""),"",0L));
-             rule2=new TestRunStatusTodo(new TestRun(new URI(""),"",0L));
+            Iterable<TestRun> testRunIterable = jiraUtils.getTestRunsByTestKey(jiraGovernorClient.getRestClient(), issue.value());
+            for(TestRun testRun: testRunIterable) {
+                // Status for testRun associate
+                rule1 = new TestRunStatusTodo(testRun);
+                
+                // Status for testExecution associate                
+                rule2 = new TestExecStatusTodo(jiraUtils.getTestExectionByKeyTestExec(jiraGovernorClient.getRestClient(), testRun.getTestExecKey()));
+                
+                // TestExecution Date between startedOn and finishedOn fields
+                // TODO HERE RAFAAAAAAAAAAAAAA
+                Date startedOn = jiraUtils.getStartedOnTestExecution(jiraGovernorClient.getRestClient(), testRun.getTestExecKey());
+                Date finishedOn = jiraUtils.getFinishedOnTestExecution(jiraGovernorClient.getRestClient(), testRun.getTestExecKey());
+            }
+            
+            
+            
+             
              result =  rule1.setAnd(rule2).validate();
 
-        } catch (URISyntaxException e) {
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

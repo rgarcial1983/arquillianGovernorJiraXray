@@ -13,6 +13,7 @@ import java.util.Collection;
 
 import org.arquillian.extension.governor.api.GovernorClient;
 import org.arquillian.extension.governor.jira.xray.api.JiraXray;
+import org.arquillian.extension.governor.jira.xray.api.validation.IJiraXrayUtils;
 import org.arquillian.extension.governor.jira.xray.configuration.JiraXrayGovernorConfiguration;
 import org.jboss.arquillian.core.spi.Validate;
 import org.jboss.arquillian.test.spi.execution.ExecutionDecision;
@@ -26,6 +27,7 @@ import com.atlassian.jira.rest.client.api.domain.input.TransitionInput;
 import com.atlassian.jira.rest.client.internal.ServerVersionConstants;
 
 import es.cuatrogatos.jira.xray.rest.client.api.XrayJiraRestClient;
+import es.cuatrogatos.jira.xray.rest.client.api.domain.TestRun.Status;
 
 /**
  *
@@ -35,6 +37,8 @@ public class JiraXrayGovernorClient implements GovernorClient<JiraXray, JiraXray
     private XrayJiraRestClient restClient;
     private JiraXrayGovernorStrategy jiraGovernorStrategy;
     private JiraXrayGovernorConfiguration jiraGovernorConfiguration;
+    
+    private IJiraXrayUtils jiraUtils = new JiraXrayUtilsImpl();
 
     private int jiraBuildNumber = 0;
 
@@ -118,8 +122,10 @@ public class JiraXrayGovernorClient implements GovernorClient<JiraXray, JiraXray
         try {
             if (resultExecutionTest) {
                 // Update PASS Test
+                jiraUtils.updateStatusTestRun(restClient, id, Status.PASS);
             } else {
-                // Update FAIL Test 
+                // Update FAIL Test
+                jiraUtils.updateStatusTestRun(restClient, id, Status.FAIL);
             }
         } catch (Exception e) {
             // error while getting Issue to close, doing nothing
