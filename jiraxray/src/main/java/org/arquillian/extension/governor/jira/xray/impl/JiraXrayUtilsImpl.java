@@ -99,7 +99,7 @@ public class JiraXrayUtilsImpl implements IJiraXrayUtils {
 
     
     /**
-     * Method auxiliary for getDateCustomField that you choose. 
+     * Method support for getDateCustomField that you choose. 
      * @param restClient
      * @param keyTestExec
      * @param customFieldDate
@@ -127,7 +127,7 @@ public class JiraXrayUtilsImpl implements IJiraXrayUtils {
             String dateWithCustomFormat = parsedDate.toString(DateTimeFormat.forPattern(CUSTOM_DATE_FORMAT));
             System.out.println(dateWithCustomFormat);
             
-            result = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dateWithCustomFormat);
+            result = new SimpleDateFormat(CUSTOM_DATE_FORMAT).parse(dateWithCustomFormat);
         }
         return result;
     }

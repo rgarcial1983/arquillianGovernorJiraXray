@@ -170,6 +170,7 @@ public class JiraXrayTestExecutionDecider implements TestExecutionDecider, Gover
                 rule2 = new TestExecStatusTodo(jiraUtils.getTestExectionByKeyTestExec(jiraGovernorClient.getRestClient(), testRun.getTestExecKey()));
                 
                 // TestExecution Date between startedOn and finishedOn fields
+                // rule3 = new TestExecStartDateOver(jiraUtils.getTestExectionByKeyTestExec(jiraGovernorClient.getRestClient(), testRun.getTestExecKey()));
                 // TODO HERE RAFAAAAAAAAAAAAAA
                 Date startedOn = jiraUtils.getStartedOnTestExecution(jiraGovernorClient.getRestClient(), testRun.getTestExecKey());
                 Date finishedOn = jiraUtils.getFinishedOnTestExecution(jiraGovernorClient.getRestClient(), testRun.getTestExecKey());
