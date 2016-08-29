@@ -33,6 +33,7 @@ import org.arquillian.extension.governor.jira.xray.api.validation.TestExecStatus
 import org.arquillian.extension.governor.jira.xray.api.validation.TestRunStatusTodo;
 import org.arquillian.extension.governor.jira.xray.configuration.JiraPropertiesUtils;
 import org.arquillian.extension.governor.jira.xray.configuration.JiraXrayGovernorConfiguration;
+import org.arquillian.extension.governor.jira.xray.domain.TestExecutionIssue;
 import org.arquillian.extension.governor.spi.GovernorProvider;
 import org.arquillian.extension.governor.spi.event.ExecutionDecisionEvent;
 import org.jboss.arquillian.core.api.InstanceProducer;
@@ -48,7 +49,6 @@ import org.jboss.arquillian.test.spi.execution.ExecutionDecision;
 import org.jboss.arquillian.test.spi.execution.ExecutionDecision.Decision;
 import org.jboss.arquillian.test.spi.execution.TestExecutionDecider;
 
-import es.cuatrogatos.jira.xray.rest.client.api.domain.TestExecutionIssue;
 import es.cuatrogatos.jira.xray.rest.client.api.domain.TestRun;
 
 /**

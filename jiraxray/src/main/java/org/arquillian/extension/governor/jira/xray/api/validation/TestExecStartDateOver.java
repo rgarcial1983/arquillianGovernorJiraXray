@@ -4,10 +4,9 @@ import java.text.ParseException;
 import java.util.Date;
 
 import org.apache.commons.lang3.time.DateUtils;
+import org.arquillian.extension.governor.jira.xray.domain.TestExecutionIssue;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
-
-import es.cuatrogatos.jira.xray.rest.client.api.domain.TestExecutionIssue;
 
 public class TestExecStartDateOver extends AbstractValidateRule<TestExecutionIssue> {
 	

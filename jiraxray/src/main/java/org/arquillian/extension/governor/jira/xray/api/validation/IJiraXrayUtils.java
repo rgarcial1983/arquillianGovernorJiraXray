@@ -4,8 +4,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.arquillian.extension.governor.jira.xray.domain.TestExecutionIssue;
+
 import es.cuatrogatos.jira.xray.rest.client.api.XrayJiraRestClient;
-import es.cuatrogatos.jira.xray.rest.client.api.domain.TestExecutionIssue;
 import es.cuatrogatos.jira.xray.rest.client.api.domain.TestRun;
 import es.cuatrogatos.jira.xray.rest.client.api.domain.TestRun.Status;
 

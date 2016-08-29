@@ -1,8 +1,7 @@
 package org.arquillian.extension.governor.jira.xray.api.validation;
 
 import org.arquillian.extension.governor.jira.xray.configuration.JiraPropertiesUtils;
-
-import es.cuatrogatos.jira.xray.rest.client.api.domain.TestExecutionIssue;
+import org.arquillian.extension.governor.jira.xray.domain.TestExecutionIssue;
 
 
 

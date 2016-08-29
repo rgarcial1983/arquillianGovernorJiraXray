@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.arquillian.extension.governor.jira.xray.api.validation.IJiraXrayUtils;
+import org.arquillian.extension.governor.jira.xray.domain.TestExecutionIssue;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -22,7 +23,6 @@ import com.google.common.base.Optional;
 
 import es.cuatrogatos.jira.xray.rest.client.api.XrayJiraRestClient;
 import es.cuatrogatos.jira.xray.rest.client.api.domain.Comment;
-import es.cuatrogatos.jira.xray.rest.client.api.domain.TestExecutionIssue;
 import es.cuatrogatos.jira.xray.rest.client.api.domain.TestRun;
 import es.cuatrogatos.jira.xray.rest.client.api.domain.TestRun.Status;
 
@@ -52,7 +52,7 @@ public class JiraXrayUtilsImpl implements IJiraXrayUtils {
                 TestRun testRun = iterator.next();
 
                 // Get testRun fully
-                TestRun testRunUpdate = restClient.getTestRunClient().getTestRun(testRun.getId()).claim();
+                TestRun testRunUpdate = restClient.getTestRunClient().getTestRun(testRun.getTestExecKey(), keyTest).claim();
 
                 // Set new Status and Update status
                 testRunUpdate.setStatus(status);
@@ -60,7 +60,7 @@ public class JiraXrayUtilsImpl implements IJiraXrayUtils {
 
                 // Call ApiRest for Update TestRun
                 restClient.getTestRunClient().updateTestRun(testRunUpdate).claim();
-            }            
+            }
 
         } catch (RestClientException e1) { // TODO: THE SERVER RETURN A 200 CODE AND A EMPTY RESPONSE, SO WE MUST EXTEND ABSTRACTRESTCLIENTO TO DEAL WITH IN PUT OPERATIONS
             if (!e1.getStatusCode().equals(Optional.absent()))
