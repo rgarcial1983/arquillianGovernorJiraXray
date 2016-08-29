@@ -18,7 +18,7 @@ package org.arquillian.extension.governor.jira.xray.impl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +48,7 @@ import org.jboss.arquillian.test.spi.execution.ExecutionDecision;
 import org.jboss.arquillian.test.spi.execution.ExecutionDecision.Decision;
 import org.jboss.arquillian.test.spi.execution.TestExecutionDecider;
 
+import es.cuatrogatos.jira.xray.rest.client.api.domain.TestExecutionIssue;
 import es.cuatrogatos.jira.xray.rest.client.api.domain.TestRun;
 
 /**
@@ -63,6 +64,10 @@ public class JiraXrayTestExecutionDecider implements TestExecutionDecider, Gover
     @Inject
     @ApplicationScoped
     private InstanceProducer<ClosePassedDecider> closePassedDecider;
+    
+    @Inject
+    @ClassScoped
+    private Map<String, List<TestRun>> mapTestRunValidationPass = new HashMap<String, List<TestRun>>();
 
     @Override
     public ExecutionDecision decide(Method testMethod) {
@@ -143,7 +148,7 @@ public class JiraXrayTestExecutionDecider implements TestExecutionDecider, Gover
             if (annotation.annotationType() == provides()) {
                 final String id = ((JiraXray) annotation).value();
                 // Call method close according result execution test (PASS/FAIL)
-                jiraGovernorClient.close(id, entry.getValue());
+                jiraGovernorClient.close(id, entry.getValue(), mapTestRunValidationPass);
             }
         }
     }
@@ -151,7 +156,7 @@ public class JiraXrayTestExecutionDecider implements TestExecutionDecider, Gover
     
     
     public boolean checkValidateRunTest(JiraXray issue, JiraXrayGovernorClient jiraGovernorClient) {
-        boolean result = true;
+        boolean result = false;
         IJiraXrayUtils jiraUtils = new JiraXrayUtilsImpl();
         
         // Rules Validates
@@ -159,27 +164,34 @@ public class JiraXrayTestExecutionDecider implements TestExecutionDecider, Gover
         TestExecStatusTodo rule2 = null;
         TestExecStartDateOver rule3 = null;
         
+        TestExecutionIssue testExec = null;
+        List<TestRun> listTestRun = new ArrayList<TestRun>();
         try {
             
             Iterable<TestRun> testRunIterable = jiraUtils.getTestRunsByTestKey(jiraGovernorClient.getRestClient(), issue.value());
+            
             for(TestRun testRun: testRunIterable) {
                 // Status for testRun associate
                 rule1 = new TestRunStatusTodo(testRun);
                 
-                // Status for testExecution associate                
-                rule2 = new TestExecStatusTodo(jiraUtils.getTestExectionByKeyTestExec(jiraGovernorClient.getRestClient(), testRun.getTestExecKey()));
+                // Get testExectution
+                testExec = jiraUtils.getTestExectionByKeyTestExec(jiraGovernorClient.getRestClient(), testRun.getTestExecKey());
+                
+                // Status for testExecution associate
+                rule2 = new TestExecStatusTodo(testExec);
                 
                 // TestExecution Date between startedOn and finishedOn fields
-                // rule3 = new TestExecStartDateOver(jiraUtils.getTestExectionByKeyTestExec(jiraGovernorClient.getRestClient(), testRun.getTestExecKey()));
-                // TODO HERE RAFAAAAAAAAAAAAAA
-                Date startedOn = jiraUtils.getStartedOnTestExecution(jiraGovernorClient.getRestClient(), testRun.getTestExecKey());
-                Date finishedOn = jiraUtils.getFinishedOnTestExecution(jiraGovernorClient.getRestClient(), testRun.getTestExecKey());
+                rule3 = new TestExecStartDateOver(testExec);
+                
+                result =  rule1.setAnd(rule2).setAnd(rule3).validate();
+                if (result) {
+                    listTestRun.add(testRun);
+                }
             }
+            // Insert listTestRun to mapTestRun
+            mapTestRunValidationPass.put(issue.value(), listTestRun);
             
-            
-            
-             
-             result =  rule1.setAnd(rule2).validate();
+            result =  !listTestRun.isEmpty();
 
         } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -187,23 +199,6 @@ public class JiraXrayTestExecutionDecider implements TestExecutionDecider, Gover
         }
                 
         return result;
-        
-        
-        
-//      List<JiraXrayRegistrationRule> rules = new ArrayList<JiraXrayRegistrationRule>();
-//      // Add Validations
-//      rules.add(new JiraXrayValidationStatusRule());
-//        
-//        
-//        
-//        
-//        // Runs Validations and check result
-//        for (JiraXrayRegistrationRule rule : rules) {
-//            if (!rule.validate(jiraIssue.value(), jiraGovernorClient)) {
-//                result = false;
-//                break;
-//            }
-//        }
-//        return result;
+
     }
 }

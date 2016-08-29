@@ -10,6 +10,8 @@ package org.arquillian.extension.governor.jira.xray.impl;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.arquillian.extension.governor.api.GovernorClient;
 import org.arquillian.extension.governor.jira.xray.api.JiraXray;
@@ -27,6 +29,7 @@ import com.atlassian.jira.rest.client.api.domain.input.TransitionInput;
 import com.atlassian.jira.rest.client.internal.ServerVersionConstants;
 
 import es.cuatrogatos.jira.xray.rest.client.api.XrayJiraRestClient;
+import es.cuatrogatos.jira.xray.rest.client.api.domain.TestRun;
 import es.cuatrogatos.jira.xray.rest.client.api.domain.TestRun.Status;
 
 /**
@@ -112,20 +115,20 @@ public class JiraXrayGovernorClient implements GovernorClient<JiraXray, JiraXray
     /**
      * Method change status testRun according resultExecutionTest
      * 
-     * @param id
+     * @param keyTest
      * @param resultRunTest
      */
-    public void close(String id, Boolean resultExecutionTest) {
+    public void close(String keyTest, Boolean resultExecutionTest, Map<String, List<TestRun>> mapTestRunValidationPass) {
 
         Validate.notNull(restClient, "Jira REST client must be specified.");
 
         try {
             if (resultExecutionTest) {
                 // Update PASS Test
-                jiraUtils.updateStatusTestRun(restClient, id, Status.PASS);
+                jiraUtils.updateStatusTestRun(restClient, keyTest, Status.PASS, mapTestRunValidationPass);
             } else {
                 // Update FAIL Test
-                jiraUtils.updateStatusTestRun(restClient, id, Status.FAIL);
+                jiraUtils.updateStatusTestRun(restClient, keyTest, Status.FAIL, mapTestRunValidationPass);
             }
         } catch (Exception e) {
             // error while getting Issue to close, doing nothing

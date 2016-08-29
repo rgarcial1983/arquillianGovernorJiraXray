@@ -2,13 +2,13 @@ package org.arquillian.extension.governor.jira.xray.api.validation;
 
 import org.arquillian.extension.governor.jira.xray.configuration.JiraPropertiesUtils;
 
-import com.atlassian.jira.rest.client.api.domain.Issue;
+import es.cuatrogatos.jira.xray.rest.client.api.domain.TestExecutionIssue;
 
 
 
-public class TestExecStatusTodo extends AbstractValidateRule<Issue> {
+public class TestExecStatusTodo extends AbstractValidateRule<TestExecutionIssue> {
 
-    public TestExecStatusTodo(Issue o) {
+    public TestExecStatusTodo(TestExecutionIssue o) {
         super(o);
     }
     
@@ -18,7 +18,7 @@ public class TestExecStatusTodo extends AbstractValidateRule<Issue> {
         if (this.and != null && this.or != null) {
             throw new IllegalArgumentException("VALIDATION RULE MALFORMED");
         }
-        Issue testExecRun = this.myObject;
+        TestExecutionIssue testExecRun = this.myObject;
         
         boolean myResult = testExecRun.getStatus().getName().equals(JiraPropertiesUtils.getInstance().getValorKey("jira.status.issue.todo"));
         return this.and != null ? myResult && this.and.validate() : (this.or != null ? myResult || this.or.validate() : myResult);

@@ -3,6 +3,9 @@ package org.arquillian.extension.governor.jira.xray.impl;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.arquillian.extension.governor.jira.xray.api.validation.IJiraXrayUtils;
@@ -16,10 +19,10 @@ import com.atlassian.jira.rest.client.api.RestClientException;
 import com.atlassian.jira.rest.client.api.domain.Issue;
 import com.atlassian.jira.rest.client.api.domain.IssueField;
 import com.google.common.base.Optional;
-import com.google.common.collect.Iterables;
 
 import es.cuatrogatos.jira.xray.rest.client.api.XrayJiraRestClient;
 import es.cuatrogatos.jira.xray.rest.client.api.domain.Comment;
+import es.cuatrogatos.jira.xray.rest.client.api.domain.TestExecutionIssue;
 import es.cuatrogatos.jira.xray.rest.client.api.domain.TestRun;
 import es.cuatrogatos.jira.xray.rest.client.api.domain.TestRun.Status;
 
@@ -29,7 +32,7 @@ public class JiraXrayUtilsImpl implements IJiraXrayUtils {
 
     private static final String FIELD_STARTED_ON = "customfield_10117";
     private static final String FIELD_FINISHED_ON = "customfield_10118";
-    
+
     private static final String CUSTOM_DATE_FORMAT = "dd/MM/yyyy HH:mm:ss";
 
     public JiraXrayUtilsImpl() {
@@ -37,26 +40,28 @@ public class JiraXrayUtilsImpl implements IJiraXrayUtils {
     }
 
     @Override
-    public void updateStatusTestRun(XrayJiraRestClient restClient, String keyTest, Status status) {
+    public void updateStatusTestRun(XrayJiraRestClient restClient, String keyTest, Status status, Map<String, List<TestRun>> mapTestRunValidationPass) {
 
         try {
+            
             // Get All testRun from keyTest
-            Iterable<TestRun> result = getTestRunsByTestKey(restClient, keyTest);
-            
-            // TODO VER CÓMO VAMOS A LLEVAR ESTO CUANDO TENGAMOS VARIOS TESTRUN PARA 
-            // Get only the first register
-            TestRun firstTestRun = Iterables.get(result, 0);
-            
-            // Get testRun fully
-            TestRun testRun = restClient.getTestRunClient().getTestRun(firstTestRun.getId()).claim();
-            
-            // Set new Status and Update status
-            testRun.setStatus(status);
-            testRun.setComment(new Comment("THIS IS A COMMENT FROM THE XRAYJIRA RESTCLIENT LIBRARY FOR JAVA","THIS IS A COMMENT FROM THE <blink>XRAYJIRA RESTCLIENT</blink> LIBRARY FOR JAVA"));
-            
-            // Call ApiRest for Update TestRun
-            restClient.getTestRunClient().updateTestRun(testRun).claim();
-            
+            List<TestRun> listTestRun = mapTestRunValidationPass.get(keyTest);
+            Iterator<TestRun> iterator = listTestRun.iterator();
+            while (iterator.hasNext()) {
+                // Retrieve testRun
+                TestRun testRun = iterator.next();
+
+                // Get testRun fully
+                TestRun testRunUpdate = restClient.getTestRunClient().getTestRun(testRun.getId()).claim();
+
+                // Set new Status and Update status
+                testRunUpdate.setStatus(status);
+                testRunUpdate.setComment(new Comment("THIS IS A COMMENT FROM THE XRAYJIRA RESTCLIENT LIBRARY FOR JAVA", "THIS IS A COMMENT FROM THE <blink>XRAYJIRA RESTCLIENT</blink> LIBRARY FOR JAVA"));
+
+                // Call ApiRest for Update TestRun
+                restClient.getTestRunClient().updateTestRun(testRunUpdate).claim();
+            }            
+
         } catch (RestClientException e1) { // TODO: THE SERVER RETURN A 200 CODE AND A EMPTY RESPONSE, SO WE MUST EXTEND ABSTRACTRESTCLIENTO TO DEAL WITH IN PUT OPERATIONS
             if (!e1.getStatusCode().equals(Optional.absent()))
                 throw e1;
@@ -64,8 +69,6 @@ public class JiraXrayUtilsImpl implements IJiraXrayUtils {
             LOG.info("JiraXrayUtilsImpl | updateStatusTestRun: " + e.getMessage());
         }
     }
-
-    
 
     @Override
     public Date getStartedOnTestExecution(XrayJiraRestClient restClient, String keyTestExec) {
@@ -97,9 +100,9 @@ public class JiraXrayUtilsImpl implements IJiraXrayUtils {
         return result;
     }
 
-    
     /**
-     * Method support for getDateCustomField that you choose. 
+     * Method support for getDateCustomField that you choose.
+     * 
      * @param restClient
      * @param keyTestExec
      * @param customFieldDate
@@ -118,7 +121,7 @@ public class JiraXrayUtilsImpl implements IJiraXrayUtils {
 
         IssueField fieldDate = issue.getField(customFieldDate);
         if (fieldDate != null && fieldDate.getValue() != null) {
-            
+
             String dateStr = fieldDate.getValue().toString();
 
             DateTimeFormatter dtf = ISODateTimeFormat.dateTime();
@@ -126,7 +129,7 @@ public class JiraXrayUtilsImpl implements IJiraXrayUtils {
 
             String dateWithCustomFormat = parsedDate.toString(DateTimeFormat.forPattern(CUSTOM_DATE_FORMAT));
             System.out.println(dateWithCustomFormat);
-            
+
             result = new SimpleDateFormat(CUSTOM_DATE_FORMAT).parse(dateWithCustomFormat);
         }
         return result;
@@ -146,21 +149,27 @@ public class JiraXrayUtilsImpl implements IJiraXrayUtils {
     }
 
     @Override
-    public Issue getTestExectionByKeyTestExec(XrayJiraRestClient restClient, String keyTestExec) {
+    public TestExecutionIssue getTestExectionByKeyTestExec(XrayJiraRestClient restClient, String keyTestExec) {
 
-        Issue result = null;
+        TestExecutionIssue result = null;
+        Issue issue = null;
+
         try {
-            
+
             // Client for get custom field
             IssueRestClient clientJira = restClient.getIssueClient();
-            
+
             // Retrieve issue
-            result = clientJira.getIssue(keyTestExec).claim();            
-            
+            issue = clientJira.getIssue(keyTestExec).claim();
+
+            // Create TestExecutionIssue
+            result = new TestExecutionIssue(issue.getSelf(), issue.getKey(), issue.getId(), issue.getStatus(), getStartedOnTestExecution(restClient, keyTestExec),
+                    getFinishedOnTestExecution(restClient, keyTestExec));
+
         } catch (Exception e) {
             LOG.info("JiraXrayUtilsImpl | getTestExectionByKeyTestExec: " + e.getMessage());
         }
-        
+
         return result;
     }
 }

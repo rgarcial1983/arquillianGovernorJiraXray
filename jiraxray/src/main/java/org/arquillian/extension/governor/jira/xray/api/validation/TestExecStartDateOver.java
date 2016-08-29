@@ -7,13 +7,14 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
-import es.cuatrogatos.jira.xray.rest.client.api.domain.TestExecution;
+import es.cuatrogatos.jira.xray.rest.client.api.domain.TestExecutionIssue;
 
-public class TestExecStartDateOver extends AbstractValidateRule<TestExecution> {
+public class TestExecStartDateOver extends AbstractValidateRule<TestExecutionIssue> {
 	
 	private static final String CUSTOM_DATE_FORMAT = "dd/MM/yyyy HH:mm:ss";
 	
-    public TestExecStartDateOver(TestExecution o) {
+    
+	public TestExecStartDateOver(TestExecutionIssue o) {
         super(o);
     }
     
@@ -22,7 +23,7 @@ public class TestExecStartDateOver extends AbstractValidateRule<TestExecution> {
     	if (this.and != null && this.or != null) {
             throw new IllegalArgumentException("VALIDATION RULE MALFORMED");
         }
-    	TestExecution testExecRun = this.myObject;
+    	TestExecutionIssue testExecRun = this.myObject;
         
     	boolean myResult = false;
     	
