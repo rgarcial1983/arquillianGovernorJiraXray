@@ -46,22 +46,23 @@ public class JiraXrayUtilsImpl implements IJiraXrayUtils {
             
             // Get All testRun from keyTest
             List<TestRun> listTestRun = mapTestRunValidationPass.get(keyTest);
-            Iterator<TestRun> iterator = listTestRun.iterator();
-            while (iterator.hasNext()) {
-                // Retrieve testRun
-                TestRun testRun = iterator.next();
-
-                // Get testRun fully
-                TestRun testRunUpdate = restClient.getTestRunClient().getTestRun(testRun.getTestExecKey(), keyTest).claim();
-
-                // Set new Status and Update status
-                testRunUpdate.setStatus(status);
-                testRunUpdate.setComment(new Comment("THIS IS A COMMENT FROM THE XRAYJIRA RESTCLIENT LIBRARY FOR JAVA", "THIS IS A COMMENT FROM THE <blink>XRAYJIRA RESTCLIENT</blink> LIBRARY FOR JAVA"));
-
-                // Call ApiRest for Update TestRun
-                restClient.getTestRunClient().updateTestRun(testRunUpdate).claim();
+            if (listTestRun != null && !listTestRun.isEmpty()) {
+                Iterator<TestRun> iterator = listTestRun.iterator();
+                while (iterator.hasNext()) {
+                    // Retrieve testRun
+                    TestRun testRun = iterator.next();
+                    
+                    // Get testRun fully
+                    TestRun testRunUpdate = restClient.getTestRunClient().getTestRun(testRun.getTestExecKey(), keyTest).claim();
+                    
+                    // Set new Status and Update status
+                    testRunUpdate.setStatus(status);
+                    testRunUpdate.setComment(new Comment("THIS IS A COMMENT FROM THE XRAYJIRA RESTCLIENT LIBRARY FOR JAVA", "THIS IS A COMMENT FROM THE <blink>XRAYJIRA RESTCLIENT</blink> LIBRARY FOR JAVA"));
+                    
+                    // Call ApiRest for Update TestRun
+                    restClient.getTestRunClient().updateTestRun(testRunUpdate).claim();
+                }
             }
-
         } catch (RestClientException e1) { // TODO: THE SERVER RETURN A 200 CODE AND A EMPTY RESPONSE, SO WE MUST EXTEND ABSTRACTRESTCLIENTO TO DEAL WITH IN PUT OPERATIONS
             if (!e1.getStatusCode().equals(Optional.absent()))
                 throw e1;
@@ -112,12 +113,9 @@ public class JiraXrayUtilsImpl implements IJiraXrayUtils {
     private Date getDateCustomField(XrayJiraRestClient restClient, String keyTestExec, String customFieldDate) throws ParseException {
 
         Date result = null;
-
-        // Client for get custom field
-        final IssueRestClient clientJira = restClient.getIssueClient();
-
+        
         // Retrieve issue
-        final Issue issue = clientJira.getIssue(keyTestExec).claim();
+        final Issue issue = restClient.getIssueClient().getIssue(keyTestExec).claim();
 
         IssueField fieldDate = issue.getField(customFieldDate);
         if (fieldDate != null && fieldDate.getValue() != null) {
