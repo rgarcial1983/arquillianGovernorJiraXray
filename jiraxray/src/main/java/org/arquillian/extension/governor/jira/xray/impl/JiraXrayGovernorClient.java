@@ -126,9 +126,15 @@ public class JiraXrayGovernorClient implements GovernorClient<JiraXray, JiraXray
             if (resultExecutionTest) {
                 // Update PASS Test
                 jiraUtils.updateStatusTestRun(restClient, keyTest, Status.PASS, mapTestRunValidationPass);
+                System.out.println("*******************************************");
+                System.out.println("*** TEST " + keyTest + " SE HA ACTUALIZADO EL ESTADO A -> " + Status.PASS);
+                System.out.println("*******************************************");
             } else {
                 // Update FAIL Test
                 jiraUtils.updateStatusTestRun(restClient, keyTest, Status.FAIL, mapTestRunValidationPass);
+                System.out.println("*******************************************");
+                System.out.println("*** TEST " + keyTest + " SE HA ACTUALIZADO EL ESTADO A -> " + Status.FAIL);
+                System.out.println("*******************************************");
             }
         } catch (Exception e) {
             // error while getting Issue to close, doing nothing

@@ -68,7 +68,7 @@ public class JiraXrayGovernorConfigurator {
         this.jiraGovernorClient.set(jiraGovernorClient);
 
         if (logger.isLoggable(Level.INFO)) {
-            System.out.println("Configuration of Arquillian JIRA extension: ");
+            System.out.println("Configuration of Arquillian JIRA XRAY extension: ");
             System.out.println(jiraGovernorConfiguration.toString());
         }
     }

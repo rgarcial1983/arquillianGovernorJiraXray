@@ -12,7 +12,7 @@ public class JiraPropertiesUtils {
 
     private Properties propJira = new Properties();
 
-    private static String filePropertiesConfig = "config.properties";
+    private static String filePropertiesConfig = "configJiraXray.properties";
 
     /**
      * @return Instance Class JiraPropertiesUtils
