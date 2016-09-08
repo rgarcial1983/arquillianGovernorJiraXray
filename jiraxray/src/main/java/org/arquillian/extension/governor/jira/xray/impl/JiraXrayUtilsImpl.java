@@ -126,8 +126,7 @@ public class JiraXrayUtilsImpl implements IJiraXrayUtils {
             DateTimeFormatter dtf = ISODateTimeFormat.dateTime();
             DateTime parsedDate = dtf.parseDateTime(dateStr);
 
-            String dateWithCustomFormat = parsedDate.toString(DateTimeFormat.forPattern(CUSTOM_DATE_FORMAT));
-            System.out.println(dateWithCustomFormat);
+            String dateWithCustomFormat = parsedDate.toString(DateTimeFormat.forPattern(CUSTOM_DATE_FORMAT));            
 
             result = new SimpleDateFormat(CUSTOM_DATE_FORMAT).parse(dateWithCustomFormat);
         }
