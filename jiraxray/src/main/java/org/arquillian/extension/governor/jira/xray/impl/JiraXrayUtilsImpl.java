@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.arquillian.extension.governor.jira.xray.api.validation.IJiraXrayUtils;
+import org.arquillian.extension.governor.jira.xray.configuration.JiraPropertiesUtils;
 import org.arquillian.extension.governor.jira.xray.domain.TestExecutionIssue;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -30,8 +31,8 @@ public class JiraXrayUtilsImpl implements IJiraXrayUtils {
 
     private static final Logger LOG = Logger.getLogger(JiraXrayUtilsImpl.class.getName());
 
-    private static final String FIELD_STARTED_ON = "customfield_10117";
-    private static final String FIELD_FINISHED_ON = "customfield_10118";
+    private static final String FIELD_STARTED_ON = JiraPropertiesUtils.getInstance().getValorKey("jira.customfield.startedon");
+    private static final String FIELD_FINISHED_ON = JiraPropertiesUtils.getInstance().getValorKey("jira.customfield.finishedon");
 
     private static final String CUSTOM_DATE_FORMAT = "dd/MM/yyyy HH:mm:ss";
 
