@@ -52,24 +52,30 @@ public class JiraXrayGovernorConfigurator {
 
     public void onGovernorExtensionConfigured(@Observes GovernorExtensionConfigured event, ArquillianDescriptor arquillianDescriptor) throws Exception {
         final JiraXrayGovernorConfiguration jiraGovernorConfiguration = new JiraXrayGovernorConfiguration();
-
-        for (final ExtensionDef extension : arquillianDescriptor.getExtensions()) {
-            if (extension.getExtensionName().equals(EXTENSION_NAME)) {
-                jiraGovernorConfiguration.setConfiguration(extension.getExtensionProperties());
-                jiraGovernorConfiguration.validate();
-                break;
+        try {
+            
+            for (final ExtensionDef extension : arquillianDescriptor.getExtensions()) {
+                if (extension.getExtensionName().equals(EXTENSION_NAME)) {
+                    jiraGovernorConfiguration.setConfiguration(extension.getExtensionProperties());
+                    jiraGovernorConfiguration.validate();
+                    break;
+                }
             }
-        }
-
-        this.jiraGovernorConfiguration.set(jiraGovernorConfiguration);
-
-        final JiraXrayGovernorClient jiraGovernorClient = new JiraXrayGovernorClientFactory().build(this.jiraGovernorConfiguration.get());
-
-        this.jiraGovernorClient.set(jiraGovernorClient);
-
-        if (logger.isLoggable(Level.INFO)) {
-            System.out.println("Configuration of Arquillian JIRA XRAY extension: ");
-            System.out.println(jiraGovernorConfiguration.toString());
+    
+            this.jiraGovernorConfiguration.set(jiraGovernorConfiguration);
+            
+            final JiraXrayGovernorClient jiraGovernorClient = new JiraXrayGovernorClientFactory().build(this.jiraGovernorConfiguration.get());
+    
+            this.jiraGovernorClient.set(jiraGovernorClient);
+    
+            if (logger.isLoggable(Level.INFO)) {
+                System.out.println("Configuration of Arquillian JIRA XRAY Extension: ");
+                System.out.println(jiraGovernorConfiguration.toString());
+            }            
+        } catch (Exception e) {
+            System.out.println("**********************************************************************************");
+            System.out.println("ERROR: CANNOT CONNECT TO SERVER JIRA-> " + jiraGovernorConfiguration.getServer());
+            System.out.println("**********************************************************************************");
         }
     }
 }

@@ -16,22 +16,19 @@
  */
 package org.arquillian.extension.governor.jira;
 
-import org.arquillian.extension.governor.jira.api.Jira;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
-import org.junit.Assert;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(Arquillian.class)
 @RunAsClient
 //@Jira("PBT-27")
 public class ITJiraGovernorTest {
-    @Test
-    @Jira(value = "PBT-27")
-    public void wontBeSkippedBecauseResolved() {
-        Assert.assertTrue(true);
-    }
+//    @Test
+//    @Jira(value = "PBT-27")
+//    public void wontBeSkippedBecauseResolved() {
+//        Assert.assertTrue(true);
+//    }
 
 //    @Test
 //    public void willBeSkippedBecauseUnresolved() {
